@@ -47,7 +47,7 @@ export default function LandingPage() {
 		}
 	};
 
-	console.log("Civic user", civicUser);
+	// console.log("Civic user", civicUser);
 
 	if (isLoading) {
 		return (

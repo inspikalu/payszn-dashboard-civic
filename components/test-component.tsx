@@ -12,7 +12,6 @@ function Test() {
     // Define an async function inside useEffect
     const fetchUser = async () => {
       const user = await getUser();
-      console.log("Fetched User:", user); // Now logs the resolved user
     };
     fetchUser();
   }, []); // Empty dependency array runs once on mount

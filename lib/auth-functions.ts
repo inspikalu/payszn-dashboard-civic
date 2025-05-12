@@ -22,7 +22,7 @@ export const createApiKey = async function (accessToken: string) {
         },
       }
     );
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (error: any) {
     console.error("Error fetching user info:", error);

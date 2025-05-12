@@ -156,7 +156,7 @@ export function WalletDropdown(): JSX.Element {
 			try {
 				const publicKey = new PublicKey(address);
 				// const publicKey = new PublicKey("CAPhoEse9xEH95XmdnJjYrZdNCA8xfUWdy3aWymHa1Vj")
-				console.log("Address on line 163: ", publicKey)
+				// console.log("Address on line 163: ", publicKey)
 
 				// Create a batch of promises for parallel execution
 				const [lamports, tokenAccounts, signatures] = await Promise.all([
@@ -168,9 +168,9 @@ export function WalletDropdown(): JSX.Element {
 						limit: 5,
 					}),
 				]);
-				console.log("Wallet data fetching data tokenAccounts: ", tokenAccounts)
-				console.log("Wallet data fetching data lamports", lamports)
-				console.log("Wallet data fetching data signatures: ", signatures)
+				// console.log("Wallet data fetching data tokenAccounts: ", tokenAccounts)
+				// console.log("Wallet data fetching data lamports", lamports)
+				// console.log("Wallet data fetching data signatures: ", signatures)
 
 				// Process SOL balance
 				const solBalance = lamports / LAMPORTS_PER_SOL;
@@ -342,7 +342,7 @@ export function WalletDropdown(): JSX.Element {
 
 			// Sign and send transaction using the embedded wallet
 			const signature = await solanaWallet.signAndSendTransaction(transaction);
-			console.log("Transaction sent:", signature);
+			// console.log("Transaction sent:", signature);
 
 			// Update the UI with new transaction and force a data refresh
 			const truncatedRecipient = `${recipientAddress.substring(
@@ -404,7 +404,7 @@ export function WalletDropdown(): JSX.Element {
 				.writeText(walletAddress)
 				.then(() => {
 						toast("Address copied to clipboard")
-					console.log("Address copied to clipboard");
+					// console.log("Address copied to clipboard");
 				})
 				.catch((err) => {
 					console.error("Failed to copy address:", err);
@@ -519,7 +519,8 @@ export function WalletDropdown(): JSX.Element {
 														navigator.clipboard
 															.writeText(walletAddress)
 															.then(() => {
-																console.log("Address copied to clipboard");
+																	toast("Address copied to clipboard")
+																// console.log("Address copied to clipboard");
 															})
 															.catch((err) => {
 																console.error("Failed to copy address:", err);
