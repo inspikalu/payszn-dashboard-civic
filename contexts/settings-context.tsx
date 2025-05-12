@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { getUserInfo, updateUserTransaction } from "@/lib/auth-functions"; // Adjust path as needed
-import { usePrivy } from "@privy-io/react-auth";
+import { useUser } from "@civic/auth-web3/react";
+import { getAccessToken } from "@/lib/get-civic-user";
 
 export interface UserSettings {
   id: number;
@@ -44,12 +45,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
   undefined
 );
 
-export function SettingsProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { getAccessToken, authenticated } = usePrivy();
+export function SettingsProvider({ children }: { children: React.ReactNode }) {
+  const civicUser = useUser();
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,11 +56,15 @@ export function SettingsProvider({
   // Get access token when authenticated
   useEffect(() => {
     const fetchAccessToken = async () => {
-      if (authenticated) {
+      if (civicUser.user) {
         try {
           const token = await getAccessToken();
-          setAccessToken(token);
-          setAuthReady(true);
+          if (token) {
+            setAccessToken(token);
+            setAuthReady(true);
+          } else {
+            throw new Error("Access token not found");
+          }
         } catch (err) {
           console.error("Error getting access token:", err);
           setError("Failed to authenticate");
@@ -73,13 +74,13 @@ export function SettingsProvider({
     };
 
     fetchAccessToken();
-  }, [authenticated, getAccessToken]);
+  }, [civicUser.user, getAccessToken]);
 
   // Fetch user settings when access token is available
   useEffect(() => {
     const fetchUserSettings = async () => {
       if (!accessToken) return;
-      
+
       try {
         setLoading(true);
         const userData = await getUserInfo(accessToken);

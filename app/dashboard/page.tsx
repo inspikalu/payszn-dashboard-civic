@@ -1,30 +1,10 @@
 "use client";
 import { AccountsOverview } from "@/components/accounts-overview";
 import { RecentTransactions } from "@/components/recent-transactions";
-import { usePrivy } from "@privy-io/react-auth";
-import { useEffect, useState } from "react";
 import { ApiKeyManagement } from "@/components/api-key-management";
+import { Toaster } from "sonner";
 
 export default function Dashboard() {
-  const { getAccessToken, authenticated } = usePrivy();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchAccessToken = async () => {
-      if (authenticated) {
-        try {
-          const token = await getAccessToken();
-          setAccessToken(token);
-          console.log("Access token:", token);
-          // Now you can use this token for API calls
-        } catch (error) {
-          console.error("Error fetching access token:", error);
-        }
-      }
-    };
-
-    fetchAccessToken();
-  }, [authenticated, getAccessToken]);
 
   return (
     <div className="space-y-6">
@@ -38,6 +18,7 @@ export default function Dashboard() {
           <RecentTransactions />
         </div>
       </div>
+	  <Toaster />
     </div>
   );
 }

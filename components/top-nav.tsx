@@ -14,21 +14,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { useLogout } from "@privy-io/react-auth";
 import { WalletDropdown } from "./wallet";
+import { useUser } from "@civic/auth-web3/react";
 
 export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const pathSegments = pathname.split("/").filter(Boolean);
   const { settings } = useSettings();
-  const { logout: PrivyLogout } = useLogout({
-    onSuccess: () => {
-      router.push("/");
-      console.log("User logged out");
-      // Any logic you'd like to execute after a user successfully logs out
-    },
-  });
+  const civicUser = useUser()
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
@@ -87,7 +81,7 @@ export function TopNav() {
                 <Link href="/dashboard/settings">Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={PrivyLogout}
+                onClick={()=>{civicUser.signOut(); router.push("/")}}
                 className="cursor-pointer"
               >
                 Log out

@@ -1,4 +1,4 @@
-import { createCivicAuthPlugin } from "@civic/auth/nextjs";
+import { createCivicAuthPlugin } from "@civic/auth-web3/nextjs";
 
 let userConfig = undefined;
 try {

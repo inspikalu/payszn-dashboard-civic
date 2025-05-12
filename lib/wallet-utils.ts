@@ -1,4 +1,3 @@
-import { ConnectedSolanaWallet, ConnectedWallet, WalletWithMetadata } from "@privy-io/react-auth";
 import {
     Connection,
     PublicKey,
@@ -29,7 +28,7 @@ export interface SolanaEmbeddedWallet {
  * @param wallets Array of wallets from useWallets hook
  * @returns The Solana embedded wallet or undefined if not found
  */
-export const getSolanaEmbeddedWallet = (
+/* export const getSolanaEmbeddedWallet = (
     wallets: ConnectedSolanaWallet[]
 ): SolanaEmbeddedWallet | undefined => {
     return wallets.find(
@@ -38,7 +37,7 @@ export const getSolanaEmbeddedWallet = (
         }
 
     ) as SolanaEmbeddedWallet | undefined;
-};
+}; */
 
 /**
  * Utility function to send a Solana transaction using the embedded wallet

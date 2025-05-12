@@ -7,11 +7,12 @@ import {
   Copy,
   ExternalLink,
 } from "lucide-react";
-import { usePrivy } from "@privy-io/react-auth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getUserTransactions } from "@/lib/auth-functions";
 import { truncateAddress } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@civic/auth-web3/react";
+import { getAccessToken } from "@/lib/get-civic-user";
 
 // Define proper TypeScript interfaces
 interface Transaction {
@@ -33,16 +34,21 @@ interface FormattedTransaction {
   date: string;
 }
 
+const is404Error = (error: unknown) => {
+  return (error as { status?: number })?.status === 404;
+};
+
 export function RecentTransactions() {
-  const { getAccessToken, authenticated } = usePrivy();
+  const civicUser = useUser()
   const [viewAll, setViewAll] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Fetch access token once when authenticated
   const fetchAccessToken = async (): Promise<string | null> => {
-    if (!authenticated) return null;
+    if (!civicUser.user) return null;
     try {
-      return await getAccessToken();
+      const token = await getAccessToken();
+      return token as unknown as string | null
     } catch (error) {
       console.error("Error getting access token:", error);
       throw new Error("Failed to get access token");
@@ -53,7 +59,7 @@ export function RecentTransactions() {
   const tokenQuery = useQuery({
     queryKey: ['accessToken'],
     queryFn: fetchAccessToken,
-    enabled: authenticated,
+    enabled: !civicUser.user ? false : true,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2
   });
@@ -66,10 +72,11 @@ export function RecentTransactions() {
       return await getUserTransactions(tokenQuery.data) as Transaction[];
     },
     enabled: !!tokenQuery.data,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    refetchOnWindowFocus: true,
-    retry: 3
-  });
+	staleTime: 1000 * 60 * 5, // Increase to 5 minutes
+    gcTime: 1000 * 60 * 30, // Keep cache for 30 minutes
+    refetchOnWindowFocus: false, // Disable or make conditional
+    refetchInterval: 1000 * 60 * 10, // Optional: Poll every 10 mins
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000)  });
 
   // Format transaction data
   const formatTransactions = (txList: Transaction[] = []): FormattedTransaction[] => {
@@ -118,28 +125,55 @@ export function RecentTransactions() {
       </CardHeader>
       <CardContent>
         {/* Loading state */}
-        {transactionsQuery.isLoading && (
-          <div className="py-6 text-center text-sm text-muted-foreground">
-            Loading transactions...
-          </div>
-        )}
-        
+{transactionsQuery.isLoading || transactionsQuery.isRefetching ? (
+  <div className="py-6 text-center text-sm text-muted-foreground">
+    {transactionsQuery.isRefetching ? 'Refreshing...' : 'Loading transactions...'}
+  </div>
+) : null}        
         {/* Error state */}
-        {transactionsQuery.isError && (
-          <div className="py-6 text-center text-sm text-red-500">
-            {transactionsQuery.error instanceof Error 
-              ? transactionsQuery.error.message 
-              : "Failed to load transactions"}
-          </div>
-        )}
-        
+{transactionsQuery.isError && (
+  <div className="py-6 text-center">
+    {is404Error(transactionsQuery.error) ? (
+      <div className="flex flex-col items-center gap-3">
+        <div className="text-muted-foreground">
+          No transactions found yet
+        </div>
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={() => transactionsQuery.refetch()}
+        >
+          Check Again
+        </Button>
+      </div>
+    ) : (
+      <div className="flex flex-col items-center gap-3">
+        <div className="text-red-500">
+          Failed to load transactions
+        </div>
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={() => transactionsQuery.refetch()}
+        >
+          Retry
+        </Button>
+      </div>
+    )}
+  </div>
+)}        
         {/* Empty state */}
-        {transactionsQuery.isSuccess && displayTransactions.length === 0 && (
-          <div className="py-6 text-center text-sm text-muted-foreground">
-            No transactions found
-          </div>
-        )}
-        
+{transactionsQuery.isSuccess && displayTransactions.length === 0 && (
+  <div className="py-6 text-center">
+    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+      <ArrowUpRight className="h-5 w-5 text-muted-foreground" />
+    </div>
+    <h4 className="text-sm font-medium">No transactions yet</h4>
+    <p className="text-sm text-muted-foreground mt-1">
+      Your transaction history will appear here
+    </p>
+  </div>
+)}        
         {/* Success state with transactions */}
         {transactionsQuery.isSuccess && displayTransactions.length > 0 && (
           <div className="space-y-4">

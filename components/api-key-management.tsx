@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Key, Copy, RefreshCw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserInfo, createApiKey } from "@/lib/auth-functions";
-import { usePrivy } from "@privy-io/react-auth";
 import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@civic/auth-web3/react";
+import { getAccessToken } from "@/lib/get-civic-user";
 
 export function ApiKeyManagement() {
-  const { getAccessToken, authenticated } = usePrivy();
+  const civicUser: any = useUser();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -19,12 +20,12 @@ export function ApiKeyManagement() {
   const { data: userInfo, isLoading } = useQuery({
     queryKey: ["userInfo"],
     queryFn: async () => {
-      if (!authenticated) return null;
+      if (!civicUser.user) return null;
       const token = await getAccessToken();
       if (!token) throw new Error("Token Not found");
       return getUserInfo(token);
     },
-    enabled: authenticated,
+    enabled: !civicUser.user ? false : true,
   });
 
   // Mutation to create a new API key
