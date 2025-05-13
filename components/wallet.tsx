@@ -237,15 +237,14 @@ export function WalletDropdown(): JSX.Element {
 			if (isAuthenticated && isOpen) {
 				try {
 					const wallet = solData.wallet;
-
 					if (wallet) {
-						setSolanaWallet(wallet);
 						setWalletAddress(solData.address);
 
 						// Only fetch data if cache is invalid or if we've never fetched before
 						if (!isCacheValid()) {
-							fetchWalletData(wallet.address);
+							fetchWalletData(solData.address);
 						}
+						setHasWallet(true);
 					} else {
 						setHasWallet(false);
 					}
@@ -403,7 +402,7 @@ export function WalletDropdown(): JSX.Element {
 			navigator.clipboard
 				.writeText(walletAddress)
 				.then(() => {
-						toast("Address copied to clipboard")
+					toast("Address copied to clipboard")
 					// console.log("Address copied to clipboard");
 				})
 				.catch((err) => {
@@ -519,7 +518,7 @@ export function WalletDropdown(): JSX.Element {
 														navigator.clipboard
 															.writeText(walletAddress)
 															.then(() => {
-																	toast("Address copied to clipboard")
+																toast("Address copied to clipboard")
 																// console.log("Address copied to clipboard");
 															})
 															.catch((err) => {
