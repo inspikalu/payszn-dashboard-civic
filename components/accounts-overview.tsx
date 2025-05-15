@@ -83,7 +83,7 @@ export function AccountsOverview() {
         <Wallet className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
 	  {data &&  <CardContent>
-        <div className="text-2xl font-bold">${data.totalBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
+        <div className="text-2xl font-bold">{data.totalBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
         <p className="text-xs text-muted-foreground">Total balance across all accounts</p>
         <div className="mt-4 space-y-2">
           {data.accounts.map((account) => (

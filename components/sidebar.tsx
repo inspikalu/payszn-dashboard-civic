@@ -6,15 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   BarChart2,
-  Building2,
-  Folder,
-  Wallet,
-  Receipt,
-  CreditCard,
-  Users2,
-  Shield,
-  MessagesSquare,
-  Video,
   Settings,
   HelpCircle,
   Menu,
@@ -46,7 +37,6 @@ export function Sidebar() {
 
   const NavItem = ({
     item,
-    isBottom = false,
   }: {
     item: {
       name: string;
