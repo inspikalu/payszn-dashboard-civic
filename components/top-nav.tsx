@@ -23,7 +23,6 @@ export function TopNav() {
   const pathSegments = pathname.split("/").filter(Boolean);
   const { settings } = useSettings();
   const civicUser = useUser()
-  console.log(civicUser.user)
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
